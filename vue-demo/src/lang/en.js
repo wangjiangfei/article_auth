@@ -46,6 +46,7 @@ export default {
     customTreeTable: 'Custom TreeTable',
     tab: 'Tab',
     form: 'Form',
+    articleManage: 'Article Manage',
     createArticle: 'Create Article',
     editArticle: 'Edit Article',
     articleList: 'Article List',

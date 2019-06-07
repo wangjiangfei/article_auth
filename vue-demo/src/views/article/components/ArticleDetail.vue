@@ -3,9 +3,7 @@
     <el-form ref="postForm" :model="postForm" :rules="rules" class="form-container">
 
       <div class="createPost-main-container">
-        <el-row>
-
-          <!-- <Warning /> -->
+        <el-row v-if="isEdit">
 
           <el-col :span="24">
 
@@ -50,7 +48,8 @@
           <Tinymce ref="editor" :height="400" v-model="postForm.content" />
         </el-form-item>
 
-        <el-button v-if="isEdit" type="primary">更新</el-button>
+        <el-button v-if="isEdit" type="primary" @click="updateEssay">更新</el-button>
+        <el-button v-else type="primary" @click="createEssay">创建</el-button>
 
       </div>
     </el-form>
@@ -64,25 +63,17 @@ import Upload from '@/components/Upload/singleImage3'
 import MDinput from '@/components/MDinput'
 import Sticky from '@/components/Sticky' // 粘性header组件
 import { validURL } from '@/utils/validate'
-import { fetchArticle } from '@/api/article'
+import { fetchArticle, createArticle, updateArticle } from '@/api/article'
 import { userSearch } from '@/api/remoteSearch'
-import Warning from './Warning'
 import { CommentDropdown, PlatformDropdown, SourceUrlDropdown } from './Dropdown'
 
 const defaultForm = {
-  status: 'draft',
-  title: '', // 文章题目
-  content: '', // 文章内容
-  content_short: '', // 文章摘要
-  source_uri: '', // 文章外链
-  image_uri: '', // 文章图片
-  display_time: undefined, // 前台展示时间
-  id: undefined
+  content: '' // 文章内容
 }
 
 export default {
   name: 'ArticleDetail',
-  components: { Tinymce, MDinput, Upload, Sticky, Warning, CommentDropdown, PlatformDropdown, SourceUrlDropdown },
+  components: { Tinymce, MDinput, Upload, Sticky, CommentDropdown, PlatformDropdown, SourceUrlDropdown },
   props: {
     isEdit: {
       type: Boolean,
@@ -103,11 +94,7 @@ export default {
     }
     return {
       postForm: Object.assign({}, defaultForm),
-      loading: false,
-      userListOptions: [],
       rules: {
-        image_uri: [{ validator: validateRequire }],
-        title: [{ validator: validateRequire }],
         content: [{ validator: validateRequire }]
       },
       tempRoute: {}
@@ -147,46 +134,30 @@ export default {
       const route = Object.assign({}, this.tempRoute, { title: `${title}-${this.postForm.articleId}` })
       this.$store.dispatch('updateVisitedView', route)
     },
-    submitForm() {
-      this.postForm.display_time = parseInt(this.display_time / 1000)
-      console.log(this.postForm)
-      this.$refs.postForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          this.$notify({
-            title: '成功',
-            message: '发布文章成功',
-            type: 'success',
-            duration: 2000
-          })
-          this.postForm.status = 'published'
-          this.loading = false
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
-    },
-    draftForm() {
-      if (this.postForm.content.length === 0 || this.postForm.title.length === 0) {
-        this.$message({
-          message: '请填写必要的标题和内容',
-          type: 'warning'
-        })
-        return
+    createEssay() {
+      if (!this.postForm.content) {
+        this.$message.error('文章内容不能为空');
+        return;
       }
-      this.$message({
-        message: '保存成功',
-        type: 'success',
-        showClose: true,
-        duration: 1000
+      createArticle(this.postForm).then(response => {
+        if (response.data.code === 100) {
+          this.$router.push({ path: '/article/list' })
+        }
+      }).catch(err => {
+        console.log(err)
       })
-      this.postForm.status = 'draft'
     },
-    getRemoteUserList(query) {
-      userSearch(query).then(response => {
-        if (!response.data.items) return
-        this.userListOptions = response.data.items.map(v => v.name)
+    updateEssay() {
+      if (!this.postForm.content) {
+        this.$message.error('文章内容不能为空');
+        return;
+      }
+      updateArticle(this.postForm).then(response => {
+        if (response.data.code === 100) {
+          this.$router.push({ path: '/article/list' })
+        }
+      }).catch(err => {
+        console.log(err)
       })
     }
   }
