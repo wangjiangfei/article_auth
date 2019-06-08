@@ -65,6 +65,14 @@ service.interceptors.response.use(
           duration: 3 * 1000
         })
       }
+      // 账户已存在
+      if (res.code === 10009) {
+        Message({
+          message: res.msg,
+          type: 'error',
+          duration: 2 * 1000
+        })
+      }
       return Promise.reject('error')
     } else {
       return response

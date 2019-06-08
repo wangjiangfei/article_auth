@@ -46,6 +46,16 @@ export const constantRouterMap = [
       }
     ]
   },
+  {
+    path: '/404',
+    component: () => import('@/views/errorPage/404'),
+    hidden: true
+  },
+  {
+    path: '/401',
+    component: () => import('@/views/errorPage/401'),
+    hidden: true
+  },
 ]
 
 export default new Router({
@@ -59,31 +69,57 @@ export const asyncRouterMap = [
     path: '/article',
     component: Layout,
     redirect: '/article/list',
-    name: 'Example',
-    meta: {
-      title: 'articleManage',
-      icon: 'example'
-    },
+    name: '文章管理',
+    meta: { title: 'articleManage', icon: 'example' },
     children: [
       {
         path: 'list',
         component: () => import('@/views/article/list'),
         name: 'ArticleList',
-        meta: { title: 'articleList', icon: 'list' }
+        meta: { title: 'articleList', icon: 'list', perm: 'article:list' }
       },
       {
         path: 'create',
         component: () => import('@/views/article/create'),
         name: 'CreateArticle',
-        meta: { title: 'createArticle', icon: 'edit' }
+        meta: { title: 'createArticle', icon: 'edit', perm: 'article:add' }
       },
       {
         path: 'edit/:id(\\d+)',
         component: () => import('@/views/article/edit'),
         name: 'EditArticle',
-        meta: { title: 'editArticle', noCache: true },
+        meta: { title: 'editArticle', noCache: true, perm: 'article:update' },
         hidden: true
       }
     ]
   },
+  {
+    path: '/user',
+    component: Layout,
+    redirect: '/user/list',
+    name: '用户管理',
+    meta: {title: 'userManage', icon: 'user'},
+    children: [
+      {
+        path: 'list', 
+        name: '用户列表', 
+        component: () => import('@/views/user/list'),
+        meta: {title: 'userList', icon: 'user', perm: 'user:list'}
+      },
+      {
+        path: 'create',
+        name: '新增用户',
+        component: () => import('@/views/user/create'),
+        meta: {title: 'userCreate', icon: 'edit', perm: 'user:add'}
+      },
+      {
+        path: 'edit/:id(\\d+)',
+        component: () => import('@/views/user/edit'),
+        name: '修改用户',
+        meta: { title: 'editUser', noCache: true, perm: 'user:update' },
+        hidden: true
+      }
+    ]
+  },
+  {path: '*', redirect: '/404', hidden: true}
 ]

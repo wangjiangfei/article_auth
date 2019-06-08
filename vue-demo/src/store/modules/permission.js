@@ -7,31 +7,52 @@ import { asyncRouterMap, constantRouterMap } from '@/router'
  */
 function hasPermission(permissionList, route) {
   if (route.meta && route.meta.perm) {
-    return permissionList.includes(route.meta.perm)
+    return permissionList.indexOf(route.meta.perm) > -1
   } else {
     return true
   }
 }
 
+// /**
+//  * 递归过滤异步路由表，返回符合用户角色权限的路由表
+//  * @param routes asyncRouterMap
+//  * @param permissionList
+//  */
+// function filterAsyncRouter(routes, permissionList) {
+//   const res = []
+
+//   routes.forEach(route => {
+//     const tmp = { ...route }
+//     if (hasPermission(permissionList, tmp)) {
+//       if (tmp.children) {
+//         tmp.children = filterAsyncRouter(tmp.children, permissionList)
+//       }
+//       res.push(tmp)
+//     }
+//   })
+//   return res
+// }
+
 /**
- * 递归过滤异步路由表，返回符合用户角色权限的路由表
- * @param routes asyncRouterMap
+ * 递归过滤异步路由表，返回符合用户菜单权限的路由表
+ * @param asyncRouterMap
  * @param permissionList
  */
-function filterAsyncRouter(routes, permissionList) {
-  const res = []
-
-  routes.forEach(route => {
-    const tmp = { ...route }
-    if (hasPermission(permissionList, tmp)) {
-      if (tmp.children) {
-        tmp.children = filterAsyncRouter(tmp.children, permissionList)
+function filterAsyncRouter(asyncRouterMap, permissionList) {
+  const accessedRouters = asyncRouterMap.filter(route => {
+    //filter,js语法里数组的过滤筛选方法
+    if (hasPermission(permissionList, route)) {
+      if (route.children && route.children.length) {
+        //如果这个路由下面还有下一级的话,就递归调用
+        route.children = filterAsyncRouter(route.children, permissionList)
+        //如果过滤一圈后,没有子元素了,这个父级菜单就也不显示了
+        return (route.children && route.children.length)
       }
-      res.push(tmp)
+      return true
     }
+    return false
   })
-
-  return res
+  return accessedRouters
 }
 
 const permission = {
