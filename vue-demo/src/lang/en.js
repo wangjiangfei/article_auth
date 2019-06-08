@@ -54,6 +54,8 @@ export default {
     userList: 'user List',
     userCreate: 'user Create',
     editUser: 'edit User',
+    permissionManage: 'permission Manage',
+    permissionList: 'permission List',
     errorPages: 'Error Pages',
     page401: '401',
     page404: '404',

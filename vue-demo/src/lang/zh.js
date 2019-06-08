@@ -54,6 +54,8 @@ export default {
     userList: '用户列表',
     userCreate: '新增用户',
     editUser: '编辑用户',
+    permissionManage: '权限管理',
+    permissionList: '权限列表',
     errorPages: '错误页面',
     page401: '401',
     page404: '404',

@@ -118,8 +118,23 @@ export const asyncRouterMap = [
         name: '修改用户',
         meta: { title: 'editUser', noCache: true, perm: 'user:update' },
         hidden: true
+      },
+    ]
+  },
+  {
+    path: '/role',
+    name: '权限管理',
+    component: Layout,
+    redirect: '/role/list',
+    meta: { title: 'permissionManage', icon: 'password' },
+    children: [
+      {
+        path: 'list', 
+        name: '权限列表', 
+        component: () => import('@/views/user/list'),
+        meta: {title: 'permissionList', icon: 'password', perm: 'user:list'}
       }
     ]
   },
-  {path: '*', redirect: '/404', hidden: true}
+  { path: '*', redirect: '/404', hidden: true }
 ]
