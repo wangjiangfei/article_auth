@@ -73,6 +73,14 @@ service.interceptors.response.use(
           duration: 2 * 1000
         })
       }
+      // 参数类型不合法
+      if (res.code === 113) {
+        Message({
+          message: res.msg,
+          type: 'error',
+          duration: 2 * 1000
+        })
+      }
       return Promise.reject('error')
     } else {
       return response

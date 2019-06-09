@@ -44,7 +44,7 @@
         </template>  
       </el-table-column>
 
-      <el-table-column align="center" label="操作" width="120">
+      <el-table-column align="center" label="操作" width="220">
         <template slot-scope="scope">
           <router-link :to="'/article/edit/' + scope.row.articleId">
             <el-button type="primary" size="mini" icon="el-icon-edit">编辑</el-button>

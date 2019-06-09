@@ -131,7 +131,7 @@ export const asyncRouterMap = [
       {
         path: 'list', 
         name: '权限列表', 
-        component: () => import('@/views/user/list'),
+        component: () => import('@/views/role/list'),
         meta: {title: 'permissionList', icon: 'password', perm: 'user:list'}
       }
     ]
