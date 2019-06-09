@@ -36,8 +36,8 @@
 
       <el-table-column align="center" label="操作" width="220">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-edit" @click="showUpdate()">编辑</el-button>
-          <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteRoleById(scope.row.roleId)">删除</el-button>
+          <el-button type="primary" size="mini" icon="el-icon-edit" @click="showUpdate(scope.$index)">编辑</el-button>
+          <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteRole(scope.row.roleId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -68,7 +68,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="createFormVisible = false">关闭</el-button>
+        <el-button type="primary" @click="addRole">新建</el-button>
+        <el-button @click="createFormVisible = false">关闭</el-button>
       </div>
     </el-dialog>
 
@@ -78,9 +79,28 @@
         <el-form-item label="角色名称" required>
           <el-input type="text" v-model="tempRole.roleName" style="width: 250px;" autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item label="菜单&权限" required>
+          <div v-for=" (menu,_index) in allPermission" :key="menu.menuName">
+            <span style="width: 100px;display: inline-block;">
+              <el-button :type="isMenuNone(_index)?'':(isMenuAll(_index)?'success':'primary')" size="mini"
+                         style="width:80px;"
+                         @click="checkAll(_index)">{{menu.menuName}}</el-button>
+            </span>
+            <div style="display: inline-block;margin-left:20px;">
+              <el-checkbox-group v-model="tempRole.permissions">
+                <el-checkbox v-for="perm in menu.permissions" :label="perm.permissionId" @change="checkRequired(perm,_index)"
+                             :key="perm.permissionId">
+                  <span :class="{ requiredPerm : perm.requiredPermission == 1}">{{ perm.permissionName }}</span>
+                </el-checkbox>
+              </el-checkbox-group>
+            </div>
+          </div>
+          <p style="color:#848484;">说明:红色权限为对应菜单内的必选权限</p>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="editFormVisible = false">关闭</el-button>
+        <el-button type="primary" @click="modifyRole">修改</el-button>
+        <el-button @click="editFormVisible = false">关闭</el-button>
       </div>
     </el-dialog>
 
@@ -88,7 +108,7 @@
 </template>
 
 <script>
-import { fetchRoleList, fetchAllPermissions } from "@/api/role";
+import { fetchRoleList, fetchAllPermissions, createRole, updateRole, deleteRoleById } from "@/api/role";
 
 export default {
   name: "RoleList",
@@ -126,9 +146,48 @@ export default {
             this.allPermission = response.data.info;
         });
     },
+    // 新增角色
+    addRole() {
+        if (this.tempRole.roleName === '') {
+            this.$message({
+                showClose: true,
+                message: '角色名不能为空',
+                type: 'error'
+            });
+            return;
+        }
+        if (this.tempRole.permissions.length == 0) {
+            this.$message({
+                showClose: true,
+                message: '请选择权限',
+                type: 'error'
+            });
+            return;
+        }
+        let data = {
+            roleName: this.tempRole.roleName,
+            permissions: this.tempRole.permissions
+        };
+        createRole(data).then(response => {
+            if (response.data.code === 100) {
+                this.$message({ showClose: true, message: '角色创建成功', type: 'success' });
+                this.createFormVisible = false;
+                this.getList();
+            }
+        })
+    },
     // 根据角色id删除该角色
-    deleteRoleById(roleId) {
-        console.log('将要删除的角色：' + roleId);
+    deleteRole(roleId) {
+        deleteRoleById(roleId).then(response => {
+            if (response.data.code === 100) {
+                this.$message({ showClose: true, message: '角色删除成功', type: 'success' });
+                this.getList();
+            }
+        }).catch(err => {})
+    },
+    // 修改角色
+    modifyRole() {
+        alert('modifyRole')
     },
     // 显示新增角色对话框
     showCreate() {
@@ -136,13 +195,18 @@ export default {
         this.createFormVisible = true;
     },
     // 显示编辑角色对话框
-    showUpdate() {
+    showUpdate($index) {
         this.clearTempRole();
-        // fetchArticle(articleId).then(response => {
-        //     if (response.data.code === 100) {
-        //     this.form = response.data.info;
-        //     }
-        // });
+        let role = this.list[$index];
+        this.tempRole.roleId = role.roleId;
+        this.tempRole.roleName = role.roleName;
+        this.tempRole.permissions = [];
+        for (let i = 0; i < role.menus.length; i++) {
+            let perms = role.menus[i].permissions;
+            for (let j = 0; j < perms.length; j++) {
+                this.tempRole.permissions.push(perms[j].permissionId);
+            }
+        }
         this.editFormVisible = true;
     },
     // 清空对话框中的数据

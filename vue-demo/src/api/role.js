@@ -20,3 +20,26 @@ export function fetchAllPermissions() {
     method: 'get'
   })
 }
+
+export function createRole(data) {
+  return request({
+    url: '/api/role/addRole',
+    method: 'post',
+    data
+  })
+}
+
+export function updateRole(data) {
+  return request({
+    url: '/api/role/updateRole',
+    method: 'put',
+    data
+  })
+}
+
+export function deleteRoleById(roleId) {
+  return request({
+    url: '/api/role/deleteRole/' + roleId,
+    method: 'delete'
+  })
+}

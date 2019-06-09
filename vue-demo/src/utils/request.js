@@ -81,6 +81,14 @@ service.interceptors.response.use(
           duration: 2 * 1000
         })
       }
+      // 角色删除失败,尚有用户属于此角色
+      if (res.code === 10008) {
+        Message({
+          message: res.msg,
+          type: 'error',
+          duration: 2 * 1000
+        })
+      }
       return Promise.reject('error')
     } else {
       return response
