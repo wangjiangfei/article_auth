@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-button type="primary" @click="showCreate" style="margin:10px;">添加角色</el-button>
+    <el-button v-if="hasPerm('role:add')" type="primary" @click="showCreate" style="margin:10px;">添加角色</el-button>
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%">
 
@@ -47,8 +47,8 @@
 
       <el-table-column align="center" label="操作" width="220">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-edit" @click="showUpdate(scope.$index)">编辑</el-button>
-          <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteRole(scope.row.roleId)">删除</el-button>
+          <el-button v-if="hasPerm('role:update')" type="primary" size="mini" icon="el-icon-edit" @click="showUpdate(scope.$index)">编辑</el-button>
+          <el-button v-if="hasPerm('role:delete')" type="danger" size="mini" icon="el-icon-delete" @click="deleteRole(scope.row.roleId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -198,7 +198,29 @@ export default {
     },
     // 修改角色
     modifyRole() {
-        alert('modifyRole')
+      if (this.tempRole.roleName === '') {
+            this.$message({
+                showClose: true,
+                message: '角色名不能为空',
+                type: 'error'
+            });
+            return;
+        }
+        if (this.tempRole.permissions.length == 0) {
+            this.$message({
+                showClose: true,
+                message: '请选择权限',
+                type: 'error'
+            });
+            return;
+        }
+        updateRole(this.tempRole).then(response => {
+            if (response.data.code === 100) {
+                this.$message({ showClose: true, message: '角色更新成功', type: 'success' });
+                this.editFormVisible = false;
+                this.getList();
+            }
+        }).catch(err => {})
     },
     // 显示新增角色对话框
     showCreate() {

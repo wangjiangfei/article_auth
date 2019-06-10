@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
 
-    <el-button type="primary" @click="toAddUserView" style="margin:10px;">添加</el-button>
+    <el-button v-if="hasPerm('user:add')" type="primary" @click="toAddUserView" style="margin:10px;">添加</el-button>
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%">
       <el-table-column align="center" label="ID" width="80">
@@ -49,7 +49,7 @@
 
       <el-table-column align="center" label="操作" width="120">
         <template slot-scope="scope">
-          <router-link :to="'/user/edit/' + scope.row.userId">
+          <router-link :to="'/user/edit/' + scope.row.userId" v-if="hasPerm('user:update')">
             <el-button type="primary" size="mini" icon="el-icon-edit">编辑</el-button>
           </router-link>
           <el-button v-if="scope.row.createUserId === curUserId" type="danger" size="small" icon="el-icon-delete" @click="deleteArticleById(scope.row.articleId)">删除</el-button>

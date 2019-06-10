@@ -19,6 +19,8 @@ import './errorLog' // error log
 import './permission' // permission control
 import './mock' // simulation data
 
+import { hasPermission } from "./utils/hasPermission"
+
 import * as filters from './filters' // global filters
 
 Vue.use(Element, {
@@ -31,6 +33,8 @@ Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
 })
 
+// 全局的常量
+Vue.prototype.hasPerm = hasPermission
 Vue.config.productionTip = false
 
 new Vue({
