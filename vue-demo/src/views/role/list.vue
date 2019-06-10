@@ -32,6 +32,17 @@
           <el-tag type="success" v-text="scope.row.roleName" v-if="scope.row.roleId === 1"></el-tag>
           <el-tag type="primary" v-text="scope.row.roleName" v-else></el-tag>
         </template>
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.roleName == '管理员'" type="success">全部</el-tag>
+          <div v-else>
+            <div v-for="menu in scope.row.menus" :key="menu.menuCode" style="text-align: left">
+              <span style="width: 100px;display: inline-block;text-align: right ">{{menu.menuName}}</span>
+              <el-tag v-for="perm in menu.permissions" :key="perm.permissionId" v-text="perm.permissionName"
+                      style="margin-right: 3px;"
+                      type="primary"></el-tag>
+            </div>
+          </div>
+        </template>
       </el-table-column>
 
       <el-table-column align="center" label="操作" width="220">
@@ -174,7 +185,7 @@ export default {
                 this.createFormVisible = false;
                 this.getList();
             }
-        })
+        }).catch(err => {})
     },
     // 根据角色id删除该角色
     deleteRole(roleId) {
