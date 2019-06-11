@@ -5,11 +5,6 @@ export function loginByUsername(username, password) {
     userName: username,
     password
   }
-  // return request({
-  //   url: '/login/login',
-  //   method: 'post',
-  //   data
-  // })
   return request({
     url: '/api/login/auth',
     method: 'post',

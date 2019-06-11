@@ -17,7 +17,6 @@ import i18n from './lang' // Internationalization
 import './icons' // icon
 import './errorLog' // error log
 import './permission' // permission control
-import './mock' // simulation data
 
 import { hasPermission } from "./utils/hasPermission"
 
