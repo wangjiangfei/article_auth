@@ -55,7 +55,6 @@ import { validURL } from '@/utils/validate'
 import { fetchArticle, createArticle, updateArticle } from '@/api/article'
 import { fetchAllRoles } from '@/api/role'
 import { addUser, fetchUserDetail, updateUser } from '@/api/user'
-import { userSearch } from '@/api/remoteSearch'
 
 const defaultForm = {
   userName: '',

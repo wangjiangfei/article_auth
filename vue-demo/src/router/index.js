@@ -1,11 +1,14 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-
 Vue.use(Router)
 
 /* Layout */
 import Layout from '@/views/layout/Layout'
+
+/* Router Modules */
+import chartsRouter from './modules/charts'
+import tableRouter from './modules/table'
 
 /** note: sub-menu only appear when children.length>=1
  *  detail see  https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
@@ -136,5 +139,8 @@ export const asyncRouterMap = [
       }
     ]
   },
+  /** When your routing table is too long, you can split it into small modules**/
+  chartsRouter,
+  tableRouter,
   { path: '*', redirect: '/404', hidden: true }
 ]

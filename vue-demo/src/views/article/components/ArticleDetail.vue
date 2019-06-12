@@ -64,7 +64,6 @@ import MDinput from '@/components/MDinput'
 import Sticky from '@/components/Sticky' // 粘性header组件
 import { validURL } from '@/utils/validate'
 import { fetchArticle, createArticle, updateArticle } from '@/api/article'
-import { userSearch } from '@/api/remoteSearch'
 
 const defaultForm = {
   content: '' // 文章内容
