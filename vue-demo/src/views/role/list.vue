@@ -60,6 +60,7 @@
           <el-input type="text" v-model="tempRole.roleName" style="width: 250px;" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="菜单&权限" required>
+          <br>
           <div v-for=" (menu,_index) in allPermission" :key="menu.menuName">
             <span style="width: 100px;display: inline-block;">
               <el-button :type="isMenuNone(_index)?'':(isMenuAll(_index)?'success':'primary')" size="mini"
