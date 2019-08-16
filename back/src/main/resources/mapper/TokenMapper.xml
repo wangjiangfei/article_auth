@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wangjiangfei.dao.TokenDao">
+
+    <!-- 开启二级缓存 -->
+    <cache eviction="LRU" flushInterval="100000" size="1024" readOnly="true"/>
+
+    <resultMap id="BaseResultMap" type="com.wangjiangfei.pojo.user.Token" >
+        <id column="token_id" property="tokenId" jdbcType="INTEGER" />
+        <result column="token_name" property="tokenName" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="effective_minutes" property="effectiveMinutes" jdbcType="INTEGER" />
+        <result column="user_id" property="userId" jdbcType="INTEGER" />
+    </resultMap>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT
+            sys_token.token_id,
+            sys_token.token_name,
+            sys_token.create_time,
+            sys_token.effective_minutes,
+            sys_token.user_id
+        FROM
+            sys_token
+        WHERE
+            sys_token.user_id = #{userId}
+        ORDER BY
+            token_id DESC LIMIT 1
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.wangjiangfei.pojo.user.Token">
+        UPDATE sys_token
+        <set >
+            <if test="tokenName != null" >
+                token_name = #{tokenName,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="effectiveMinutes != null" >
+                effective_minutes = #{effectiveMinutes,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null" >
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+        </set>
+        WHERE token_id = #{tokenId,jdbcType=INTEGER}
+    </update>
+
+    <insert id="insertSelective" parameterType="com.wangjiangfei.pojo.user.Token" flushCache="true">
+        INSERT INTO sys_token
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="tokenId != null" >
+                token_id,
+            </if>
+            <if test="tokenName != null" >
+                token_name,
+            </if>
+            <if test="createTime != null" >
+                create_time,
+            </if>
+            <if test="effectiveMinutes != null" >
+                effective_minutes,
+            </if>
+            <if test="userId != null" >
+                user_ID,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="tokenId != null" >
+                #{tokenId,jdbcType=INTEGER},
+            </if>
+            <if test="tokenName != null" >
+                #{tokenName,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="effectiveMinutes != null" >
+                #{effectiveMinutes,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null" >
+                #{userId,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="getUserIdByTokenName" resultType="java.lang.Integer" parameterType="java.lang.String">
+        SELECT
+            sys_token.user_id
+        FROM
+            sys_token
+        WHERE
+            sys_token.token_name = #{tokenName}
+    </select>
+
+    <select id="selectTokenByTokenName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+            sys_token.token_id,
+            sys_token.token_name,
+            sys_token.create_time,
+            sys_token.effective_minutes,
+            sys_token.user_id
+        FROM
+            sys_token
+        WHERE
+            sys_token.token_name = #{tokenName}
+    </select>
+
+</mapper>

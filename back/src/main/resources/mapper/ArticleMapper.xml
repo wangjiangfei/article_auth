@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wangjiangfei.dao.ArticleDao">
+
+    <!-- 开启二级缓存 -->
+    <cache eviction="LRU" flushInterval="100000" size="1024" readOnly="true"/>
+
+    <resultMap id="BaseResultMap" type="com.wangjiangfei.pojo.article.Article" >
+        <id column="article_id" property="articleId" jdbcType="INTEGER" />
+        <result column="content" property="content" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="delete_status" property="deleteStatus" jdbcType="VARCHAR" />
+        <result column="create_user_id" property="createUserId" jdbcType="INTEGER"/>
+        <result column="update_user_id" property="updateUserId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap02" type="com.wangjiangfei.pojo.article.ArticleInfo" >
+        <id column="article_id" property="articleId" jdbcType="INTEGER" />
+        <result column="content" property="content" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="delete_status" property="deleteStatus" jdbcType="VARCHAR" />
+        <result column="create_user_id" property="createUserId" jdbcType="INTEGER"/>
+        <result column="update_user_id" property="updateUserId" jdbcType="INTEGER"/>
+        <result column="create_user_name" property="createUserName" jdbcType="VARCHAR" />
+        <result column="update_user_name" property="updateUserName" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="countArticle" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM
+            article
+    </select>
+
+    <select id="listArticle" resultMap="BaseResultMap02">
+        SELECT
+            article.article_id,
+            article.content,
+            article.create_time,
+            article.update_time,
+            article.create_user_id,
+            article.update_user_id,
+            article.delete_status,
+            ( SELECT user_name FROM sys_user WHERE user_id = article.create_user_id ) AS create_user_name,
+            ( SELECT user_name FROM sys_user WHERE user_id = article.update_user_id ) AS update_user_name
+        FROM
+            article
+            LEFT JOIN sys_user ON article.create_user_id = sys_user.user_id
+            AND article.update_user_id = sys_user.user_id
+        WHERE article.delete_status = '1'
+            LIMIT #{offSet}, #{pageRow}
+    </select>
+
+    <select id="getDetailById" resultMap="BaseResultMap02">
+        SELECT
+            article.article_id,
+            article.content,
+            article.create_time,
+            article.update_time,
+            article.create_user_id,
+            article.update_user_id,
+            article.delete_status,
+            ( SELECT user_name FROM sys_user WHERE user_id = article.create_user_id ) AS create_user_name,
+            ( SELECT user_name FROM sys_user WHERE user_id = article.update_user_id ) AS update_user_name
+        FROM
+            article
+            LEFT JOIN sys_user ON article.create_user_id = sys_user.user_id
+            AND article.update_user_id = sys_user.user_id
+        WHERE article.delete_status = '1'
+        AND article.article_id = #{articleId}
+    </select>
+
+    <insert id="addArticle" parameterType="com.wangjiangfei.pojo.article.ArticleInfo">
+        INSERT INTO article
+            (content, create_user_id, update_user_id)
+        VALUES
+            (#{content}, #{createUserId}, #{updateUserId})
+    </insert>
+
+    <update id="updateArticle" parameterType="com.wangjiangfei.pojo.article.ArticleInfo">
+        UPDATE article
+        SET
+            content = #{content},
+            update_user_id = #{updateUserId}
+        WHERE article_id = #{articleId}
+    </update>
+
+    <select id="getArticleById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+            article.article_id,
+            article.content,
+            article.create_time,
+            article.update_time,
+            article.delete_status,
+            article.create_user_id,
+            article.update_user_id
+        FROM
+            article
+        WHERE
+            article_id = #{articleId}
+    </select>
+
+    <delete id="deleteArticleById" parameterType="java.lang.Integer">
+        DELETE FROM article WHERE article_id = #{articleId}
+    </delete>
+
+</mapper>

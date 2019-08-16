@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wangjiangfei.dao.RoleDao">
+
+    <resultMap id="BaseResultMap" type="com.wangjiangfei.pojo.role.RoleInfo" >
+        <result column="role_id" property="roleId" jdbcType="INTEGER" />
+        <result column="role_name" property="roleName" jdbcType="INTEGER" />
+        <collection property="users" ofType="com.wangjiangfei.pojo.user.User">
+            <id column="user_id" property="userId"/>
+            <result column="nickname" property="nickname"/>
+        </collection>
+        <collection property="menus" ofType="com.wangjiangfei.pojo.role.Menu">
+            <id column="menu_code" property="menuCode"/>
+            <result column="menu_name" property="menuName"/>
+            <collection property="permissions" ofType="com.wangjiangfei.pojo.user.Permission">
+                <id column="permission_id" property="permissionId"/>
+                <result column="permission_name" property="permissionName"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <resultMap id="BaseResultMap02" type="com.wangjiangfei.pojo.role.Menu" >
+        <id column="menu_code" property="menuCode"/>
+        <result column="menu_name" property="menuName"/>
+        <collection property="permissions" ofType="com.wangjiangfei.pojo.user.Permission">
+            <id column="permission_id" property="permissionId"/>
+            <result column="permission_name" property="permissionName"/>
+            <result column="required_permission" property="requiredPermission"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="BaseResultMap03" type="com.wangjiangfei.pojo.role.RoleDetail" >
+        <id column="role_id" property="roleId"/>
+        <result column="role_name" property="roleName"/>
+        <collection property="permissions" ofType="java.lang.Integer">
+            <id column="permission_id" property="permissionId"/>
+        </collection>
+        <collection property="users" ofType="java.lang.Integer">
+            <id column="user_id" property="userId"/>
+        </collection>
+    </resultMap>
+
+    <select id="listRole" resultMap="BaseResultMap">
+        SELECT
+            sys_role.role_id,
+            sys_role.role_name,
+            sys_user.user_id,
+            sys_user.user_name,
+            sys_user.nickname,
+            sys_permission.menu_code,
+            sys_permission.menu_name,
+            sys_permission.permission_id,
+            sys_permission.permission_name
+        FROM
+            sys_role
+            LEFT JOIN sys_user ON sys_user.role_id = sys_role.role_id
+            AND sys_user.delete_status = '1'
+            LEFT JOIN sys_role_permission ON sys_role_permission.role_id = sys_role.role_id
+            AND sys_role_permission.delete_status = '1'
+            LEFT JOIN sys_permission ON sys_role_permission.permission_id = sys_permission.permission_id
+        WHERE sys_role.delete_status = '1'
+        ORDER BY
+            sys_role.role_id,
+            sys_permission.permission_id
+    </select>
+
+    <select id="listAllPermission" resultMap="BaseResultMap02">
+        SELECT
+            sys_permission.menu_code,
+            sys_permission.menu_name,
+            sys_permission.permission_id,
+            sys_permission.permission_name,
+            sys_permission.required_permission
+        FROM
+            sys_permission
+    </select>
+
+    <insert id="insertRole" useGeneratedKeys="true" keyProperty="roleId" parameterType="com.wangjiangfei.pojo.role.RoleDetail">
+        INSERT INTO sys_role
+        (role_name)
+        VALUES (#{roleName})
+    </insert>
+
+    <insert id="insertRolePermission" parameterType="com.wangjiangfei.pojo.role.RoleDetail">
+        insert into sys_role_permission (role_id, permission_id)
+        values
+        <foreach collection="permissions" item="item" index="index" separator=",">
+            (#{roleId}, #{item})
+        </foreach>
+    </insert>
+
+    <select id="getRoleAllInfo" resultMap="BaseResultMap03">
+        SELECT
+            sys_role.role_id,
+            sys_role.role_name,
+            sys_user.user_id,
+            sys_permission.permission_id
+        FROM
+            sys_role
+            LEFT JOIN sys_user ON sys_user.role_id = sys_role.role_id
+            AND sys_user.delete_status = '1'
+            LEFT JOIN sys_role_permission ON sys_role_permission.role_id = sys_role.role_id
+            AND sys_role_permission.delete_status = '1'
+            LEFT JOIN sys_permission ON sys_role_permission.permission_id = sys_permission.permission_id
+        WHERE
+            sys_role.role_id = #{roleId}
+    </select>
+
+    <update id="updateRoleName" parameterType="com.wangjiangfei.pojo.role.RoleDetail">
+        UPDATE sys_role
+        SET
+        role_name = #{roleName}
+        WHERE role_id = #{roleId}
+    </update>
+
+    <update id="removeOldPermission">
+        UPDATE sys_role_permission
+        SET
+        delete_status = '2'
+        WHERE role_id = #{roleId}
+        AND permission_id in (
+        <foreach collection="permissions" item="item" index="index" separator=",">
+            #{item}
+        </foreach>
+        )
+    </update>
+
+    <update id="removeRoleAllPermission">
+        UPDATE sys_role_permission
+        SET
+        delete_status = '2'
+        WHERE role_id = #{roleId}
+    </update>
+
+    <update id="removeRole">
+        UPDATE sys_role
+        SET
+        delete_status = '2'
+        WHERE role_id = #{roleId} and role_id != 1
+    </update>
+
+    <select id="countByRoleName" resultType="java.lang.Integer" parameterType="java.lang.String">
+        SELECT
+            COUNT( * )
+        FROM
+            sys_role
+        WHERE
+            role_name = #{roleName}
+            AND delete_status = '1'
+    </select>
+
+</mapper>

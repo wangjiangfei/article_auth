@@ -52,7 +52,7 @@
           <router-link :to="'/user/edit/' + scope.row.userId" v-if="hasPerm('user:update')">
             <el-button type="primary" size="mini" icon="el-icon-edit">编辑</el-button>
           </router-link>
-          <el-button v-if="scope.row.createUserId === curUserId" type="danger" size="small" icon="el-icon-delete" @click="deleteArticleById(scope.row.articleId)">删除</el-button>
+          <el-button v-if="scope.row.userId !== 10003" type="danger" size="small" icon="el-icon-delete" @click="deleteUserById(scope.row.userId)">删除</el-button>
         </template>
       </el-table-column>
 
@@ -141,19 +141,21 @@ export default {
       this.listQuery.page = val
       this.getList()
     },
-    deleteArticleById(articleId) {
-      deleteArticle(articleId).then(response => {
-        if (response.data.code === 100) {
-          this.$message({
-            showClose: true,
-            message: '删除成功',
-            type: 'success'
-          });
-          this.getList()
-        }
-      }).catch(err => {
+    deleteUserById(userId) {
+      console.log(userId);
+      
+      // deleteArticle(articleId).then(response => {
+      //   if (response.data.code === 100) {
+      //     this.$message({
+      //       showClose: true,
+      //       message: '删除成功',
+      //       type: 'success'
+      //     });
+      //     this.getList()
+      //   }
+      // }).catch(err => {
 
-      })
+      // })
     },
     showDetailById(articleId) {
       fetchArticle(articleId).then(response => {
